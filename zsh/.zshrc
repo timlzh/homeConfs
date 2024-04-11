@@ -1,4 +1,4 @@
-if [[ -z "$TMUX"  ]]  && [ "$WT_SESSION" != "" ] && [[ -z "$VSCODE_INJECTION" ]]; then
+if [[ -z "$TMUX"  ]]  && [[ -z "$VSCODE_INJECTION" ]]; then
     tmux attach -t default || exec tmux new-session -A -s default
 fi
 
@@ -149,12 +149,9 @@ alias his='history | grep'
 
 alias dc='docker compose'
 
-alias lazydocker='/home/timlzh/.local/bin/lazydocker'
 alias clash='nohup /opt/clash/cfw 2>&1 > /dev/null &'
 alias cproxy='proxychains -f ~/clashproxy.conf'
 
-# alias volatility='python3 ~/Documents/CNSS/volatility3/vol.py'
-# alias volatility2='python2 ~/Documents/CNSS/volatility2/vol.py --plugins=/home/timlzh/Documents/volatility_profiles'
 alias volatility='python2 ~/Apps/volatility/vol.py'
 
 export PATH=$PATH:/usr/bin:/usr/local/go/bin:~/Documents/CNSS/NSSCTF/DexPatcher-scripts:/home/timlzh/.local/bin:/home/timlzh/Apps/Android-NDK:/home/timlzh/Apps/Android-NDK/toolchains/llvm/prebuilt/linux-x86_64/bin
@@ -183,9 +180,9 @@ alias ord="python -c 'import sys; print(ord(sys.argv[1]))'"
 alias hex="python -c 'import sys; print(hex(int(sys.argv[1])))'"
 
 alias godzilla="(cd ~/Apps/Godzilla && java -jar godzilla.jar)"
-alias pwninit="~/Apps/pwninit"
-alias ida32='wine ~/Apps/IDA8/ida.exe'
-alias ida64='wine ~/Apps/IDA8/ida64.exe'
+alias pwninit="~/.homeConfs/gdb/pwninit"
+alias ida32='/mnt/e/IDA8/ida.exe'
+alias ida64='/mnt/e/IDA8/ida64.exe'
 function ida() {
     fileName=$1
     if [ -z "$fileName" ]; then
@@ -201,11 +198,11 @@ function ida() {
     fileType=$(file $fileName)
     
     if [[ $fileType == *"64-bit"* ]]; then
-        # ida64 $fileName &
-        nohup wine ~/Apps/IDA8/ida64.exe $fileName 2>&1 > /dev/null &
+        ida64 $fileName &
+        # nohup wine ~/Apps/IDA8/ida64.exe $fileName 2>&1 > /dev/null &
     elif [[ $fileType == *"32-bit"* ]]; then
-        # ida32 $fileName &
-        nohup wine ~/Apps/IDA8/ida.exe $fileName 2>&1 > /dev/null &
+        ida32 $fileName &
+        # nohup wine ~/Apps/IDA8/ida.exe $fileName 2>&1 > /dev/null &
     else
         echo "Unknown file type: $fileType"
     fi
@@ -221,7 +218,7 @@ function socatStart() {
     local port=$2
 
     if [ -z "$fileName" ]; then
-        echo "Usage: socatStart <file> [port]"
+        echo "Usage: socatStart <file/command> [port]"
         return
     fi
 
@@ -231,11 +228,11 @@ function socatStart() {
     fi
 
     if [ ! -f "$fileName" ]; then
-        echo "File not found: $fileName"
-        return
+        echo "File not found: $fileName, regarding as command"
+    else
+        file $fileName
     fi
-
-    file $fileName
+    
     echo ''
     echo "socat tcp-listen:$RED$port$NC,reuseaddr,fork EXEC:$RED$fileName$NC,pty,raw,echo=0"
     socat tcp-listen:$port,reuseaddr,fork EXEC:$fileName,pty,raw,echo=0

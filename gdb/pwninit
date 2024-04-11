@@ -1,0 +1,55 @@
+#!/bin/bash
+for file in $(ls); do
+    fileType=$(file $file)
+
+    if [[ $fileType == *"ELF"* ]]; then
+        chmod +x $file
+        echo ======$file======
+        echo $fileType
+        echo ""
+        checksec $file
+        echo =================
+        echo ""
+    fi
+done
+
+# Create exp.py
+if [[ ! -f "exp.py" ]]; then
+echo "Create exp.py"
+cat > exp.py << EOF
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from pwn import *
+from pwn import p64, u64, p32, u32
+import os
+
+context.terminal = ['tmux', 'splitw', '-h', '-p', '80']
+context.log_level = 'debug'
+context.arch = 'amd64'
+
+host = '192.168.2.10'
+port = 10001
+fileName = './pwn'
+# libcName = './libc.so.6'
+r = process(fileName)
+# r = remote('127.0.0.1', 10001)
+# r = remote(host, port)
+elf = ELF(fileName)
+# libc = ELF(libcName)
+
+def debug(p, cmd = ''):
+    if os.environ.get('VSCODE_INJECTION', None):
+        return
+    gdb.attach(p, cmd)
+    pause()
+
+debug(r)
+
+payload = cyclic(0x10 + 8) + p64(114514)
+r.sendlineafter(b'\n', payload)
+
+r.interactive()
+EOF
+
+fi
+chmod +x exp.py
