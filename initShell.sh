@@ -61,6 +61,7 @@ cd ~/.homeConfs
 # init zsh
 ln -s -f ~/.homeConfs/zsh/.zshrc ~/.zshrc
 ln -s -f ~/.homeConfs/zsh/.p10k.zsh ~/.p10k.zsh
+touch ~/.zshrc.local
 
 # init tmux
 ln -s -f ~/.homeConfs/tmux/.tmux.conf ~/.tmux.conf
