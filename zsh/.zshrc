@@ -1,5 +1,10 @@
+IS_WSL=false
+if [ -f /proc/sys/fs/binfmt_misc/WSLInterop ]; then
+    IS_WSL=true
+fi
+
 if [[ -z "$TMUX"  ]]  && [[ -z "$VSCODE_INJECTION" ]]; then
-    tmux attach -t default || exec tmux new-session -A -s default
+  tmux -u attach -t default || exec tmux -u new-session -A -s default
 fi
 
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
@@ -123,12 +128,17 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-#
+
 export PROXY=http://127.0.0.1:7890
+if [ $IS_WSL = true ]; then
+    export PROXY=http://$(cat /etc/resolv.conf |grep "nameserver" |cut -f 2 -d " "):7890
+fi
 alias proxyEnable="export ALL_PROXY=$PROXY
 export all_proxy=$PROXY
 export HTTP_PROXY=$PROXY
 export http_proxy=$PROXY
+export HTTPS_PROXY=$PROXY
+export https_proxy=$PROXY
 export NO_PROXY=localhost,127.0.0.1,::1
 export no_proxy=$NO_PROXY"
 
@@ -136,6 +146,8 @@ alias proxyDisable="unset ALL_PROXY
 unset all_proxy
 unset HTTP_PROXY
 unset http_proxy
+unset HTTPS_PROXY
+unset https_proxy
 unset NO_PROXY
 unset no_proxy"
 
@@ -174,6 +186,8 @@ function cccat() {
 }
 
 alias cat="cccat"
+alias vim="nvim"
+alias vi="nvim"
 
 alias chr="python -c 'import sys; print(chr(int(sys.argv[1],16) if \"0x\" in sys.argv[1] else int(sys.argv[1])).encode())'"
 alias ord="python -c 'import sys; print(ord(sys.argv[1]))'"
@@ -242,7 +256,7 @@ function socatStart() {
     socat tcp-listen:$port,reuseaddr,fork EXEC:$fileName,pty,raw,echo=0
 }
 
-
+export LANG="en_US.UTF-8"
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 ___MY_VMOPTIONS_SHELL_FILE="${HOME}/.jetbrains.vmoptions.sh"; if [ -f "${___MY_VMOPTIONS_SHELL_FILE}" ]; then . "${___MY_VMOPTIONS_SHELL_FILE}"; fi
