@@ -189,6 +189,12 @@ alias cat="cccat"
 alias vim="nvim"
 alias vi="nvim"
 
+if [$IS_WSL = true]; then
+  alias neovide="neovide.exe"
+fi
+
+alias nvd="neovide"
+
 alias chr="python -c 'import sys; print(chr(int(sys.argv[1],16) if \"0x\" in sys.argv[1] else int(sys.argv[1])).encode())'"
 alias ord="python -c 'import sys; print(ord(sys.argv[1]))'"
 alias hex="python -c 'import sys; print(hex(int(sys.argv[1])))'"
